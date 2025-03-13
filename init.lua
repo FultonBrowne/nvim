@@ -66,13 +66,25 @@ require("nvim-tree").setup({
 -- LSP Configuration
 require("mason").setup()
 require("mason-lspconfig").setup({
-	ensure_installed = { "lua_ls", "pyright", "rust_analyzer", "tsserver", "elixirls" },
+	ensure_installed = { "lua_ls", "pyright", "rust_analyzer", "ts_ls", "elixirls" },
 	automatic_installation = true,
 })
 
 local lspconfig = require("lspconfig")
 lspconfig.gleam.setup({})
+
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
+lspconfig.ts_ls.setup({ capabilities = capabilities })
+lspconfig.eslint.setup({
+	on_attach = function(client, bufnr)
+		vim.api.nvim_create_autocmd("BufWritePre", {
+			buffer = bufnr,
+			command = "EslintFixAll",
+		})
+	end,
+	capabilities = capabilities
+})
+
 
 require("mason-lspconfig").setup_handlers({
 	function(server_name)
@@ -174,9 +186,9 @@ vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
 vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover Information" })
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
 vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Actions" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show Diagnostics" })
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous Diagnostic" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next Diagnostic" })
+vim.keymap.set("n", "<leader>do", vim.diagnostic.open_float, { desc = "Show Diagnostics" })
+vim.keymap.set("n", "<leader>dp", vim.diagnostic.goto_prev, { desc = "Previous Diagnostic" })
+vim.keymap.set("n", "<leader>dn", vim.diagnostic.goto_next, { desc = "Next Diagnostic" })
 
 -- Enable true color support
 vim.opt.termguicolors = true
@@ -213,3 +225,7 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.bo.expandtab = true -- Use spaces instead of tabs
 	end
 })
+
+
+-- Set up tab stops
+vim.opt.tabstop = 3
