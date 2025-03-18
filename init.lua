@@ -183,12 +183,14 @@ vim.keymap.set("n", "<leader>qo", ":BufOnly<CR>", { desc = "Close All But Curren
 
 -- LSP keybindings
 vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
+vim.keymap.set("n", "gr", telescope.lsp_references, { desc = "Go to References" })
 vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover Information" })
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
 vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Actions" })
 vim.keymap.set("n", "<leader>do", vim.diagnostic.open_float, { desc = "Show Diagnostics" })
 vim.keymap.set("n", "<leader>dp", vim.diagnostic.goto_prev, { desc = "Previous Diagnostic" })
 vim.keymap.set("n", "<leader>dn", vim.diagnostic.goto_next, { desc = "Next Diagnostic" })
+-- Show function defs in insert mode
 
 -- Enable true color support
 vim.opt.termguicolors = true
@@ -215,6 +217,18 @@ vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave" },
 vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter" },
 	{ group = num_group, callback = function() vim.opt.relativenumber = false end })
 
+
+-- Set up tab stops
+vim.opt.tabstop = 3
+
+-- Auto save on normal mode
+vim.api.nvim_create_autocmd("InsertLeave", {
+	pattern = "*",
+	callback = function()
+		vim.cmd("silent! write")
+	end
+})
+
 -- Set up langauge specific settings
 -- Set Gleam filetype indentation to 2 spaces
 vim.api.nvim_create_autocmd("FileType", {
@@ -225,7 +239,3 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.bo.expandtab = true -- Use spaces instead of tabs
 	end
 })
-
-
--- Set up tab stops
-vim.opt.tabstop = 3
