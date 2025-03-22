@@ -1,4 +1,7 @@
 vim.optfcmdheight = 0 -- Optional: Hide command line when not in use
+-- disable mouse
+vim.opt.mouse = ""
+
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -28,20 +31,44 @@ require("lazy").setup({
 				"zbirenbaum/copilot-cmp",
 			}
 		},
-		{ "zbirenbaum/copilot.lua",          cmd = "Copilot",                                 event = "InsertEnter" },
-		{ "zbirenbaum/copilot-cmp",          dependencies = { "zbirenbaum/copilot.lua" } },
-		{ "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
+		{ "zbirenbaum/copilot.lua",                 cmd = "Copilot",                                 event = "InsertEnter" },
+		{ "zbirenbaum/copilot-cmp",                 dependencies = { "zbirenbaum/copilot.lua" } },
+		{ "nvim-treesitter/nvim-treesitter",        build = ":TSUpdate" },
+		{ 'nvim-treesitter/nvim-treesitter-context' },
 
 		-- UI Enhancements
-		{ "catppuccin/nvim",                 name = "catppuccin",                             priority = 1000 },
-		{ "nvim-lualine/lualine.nvim",       dependencies = { "nvim-tree/nvim-web-devicons" } },
-		{ "folke/which-key.nvim",            event = "VeryLazy" },
-		{ "nvim-tree/nvim-tree.lua",         dependencies = { "nvim-tree/nvim-web-devicons" } },
+		{ "catppuccin/nvim",                        name = "catppuccin",                             priority = 1000 },
+		{ "nvim-lualine/lualine.nvim",              dependencies = { "nvim-tree/nvim-web-devicons" } },
+		{ "folke/which-key.nvim",                   event = "VeryLazy" },
+		{ "nvim-tree/nvim-tree.lua",                dependencies = { "nvim-tree/nvim-web-devicons" } },
 
 		-- Productivity
-		{ "nvim-telescope/telescope.nvim",   cmd = "Telescope" },
+		{ "nvim-telescope/telescope.nvim",          cmd = "Telescope" },
 		{ "stevearc/conform.nvim" },
-
+		{
+			"theprimeagen/harpoon",
+			branch = "harpoon2",
+			dependencies = { "nvim-lua/plenary.nvim" },
+			config = function()
+				require("harpoon"):setup()
+			end,
+			keys = {
+				{ "<leader>A", function() require("harpoon"):list():append() end,  desc = "harpoon file", },
+				{
+					"<tab>",
+					function()
+						local harpoon = require("harpoon")
+						harpoon.ui:toggle_quick_menu(harpoon:list())
+					end,
+					desc = "harpoon quick menu",
+				},
+				{ "<leader>1", function() require("harpoon"):list():select(1) end, desc = "harpoon to file 1", },
+				{ "<leader>2", function() require("harpoon"):list():select(2) end, desc = "harpoon to file 2", },
+				{ "<leader>3", function() require("harpoon"):list():select(3) end, desc = "harpoon to file 3", },
+				{ "<leader>4", function() require("harpoon"):list():select(4) end, desc = "harpoon to file 4", },
+				{ "<leader>5", function() require("harpoon"):list():select(5) end, desc = "harpoon to file 5", },
+			},
+		},
 		-- Icons & Misc
 		{ "nvim-tree/nvim-web-devicons" },
 	},
@@ -164,7 +191,12 @@ vim.keymap.set("n", "<leader>fa", telescope.find_files, { desc = "Find Files" })
 vim.keymap.set("n", "<leader>fg", telescope.live_grep, { desc = "Live Grep" })
 vim.keymap.set("n", "<leader>fo", telescope.lsp_document_symbols, { desc = "Show Symbols" })
 vim.keymap.set("n", "<leader>fs", ":NvimTreeToggle<CR>", { desc = "Toggle File Tree" })
-vim.keymap.set("n", "<tab>", telescope.buffers, { desc = "List Buffers" })
+vim.keymap.set("n", "<leader>fb", telescope.buffers, { desc = "List Buffers" })
+-- Telescop git commands
+vim.keymap.set("n", "<leader>gc", telescope.git_commits, { desc = "List Commits" })
+vim.keymap.set("n", "<leader>gb", telescope.git_branches, { desc = "List Branches" })
+vim.keymap.set("n", "<leader>gs", telescope.git_status, { desc = "Show Status" })
+
 
 -- Window navigation
 vim.keymap.set("n", "<leader>bs", ":vsplit<CR>", { desc = "Split Left" })
@@ -190,7 +222,19 @@ vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action
 vim.keymap.set("n", "<leader>do", vim.diagnostic.open_float, { desc = "Show Diagnostics" })
 vim.keymap.set("n", "<leader>dp", vim.diagnostic.goto_prev, { desc = "Previous Diagnostic" })
 vim.keymap.set("n", "<leader>dn", vim.diagnostic.goto_next, { desc = "Next Diagnostic" })
--- Show function defs in insert mode
+-- Clipboard keybindings
+vim.keymap.set("n", "<leader>s", function()
+	local unnamed = vim.fn.getreg('"')
+	local system = vim.fn.getreg('*')
+
+	-- Swap the registers
+	vim.fn.setreg('"', system)
+	vim.fn.setreg('*', unnamed)
+
+	print("Swapped unnamed register and system clipboard")
+end, { desc = "Swap paste buffer with system clipboard" })
+-- paste without losing the paste buffer
+vim.keymap.set("x", "<leader>p", [["_dP]], { desc = "Paste without overwrite" })
 
 -- Enable true color support
 vim.opt.termguicolors = true
