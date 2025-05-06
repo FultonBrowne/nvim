@@ -93,7 +93,7 @@ require("nvim-tree").setup({
 -- LSP Configuration
 require("mason").setup()
 require("mason-lspconfig").setup({
-	ensure_installed = { "lua_ls", "pyright", "rust_analyzer", "ts_ls", "elixirls" },
+	ensure_installed = { "lua_ls", "pyright", "rust_analyzer", "ts_ls", "elixirls", "rust_analyzer" },
 	automatic_installation = true,
 })
 
