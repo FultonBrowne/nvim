@@ -1,8 +1,4 @@
 vim.optfcmdheight = 0 -- Optional: Hide command line when not in use
--- disable mouse
-vim.opt.mouse = ""
-
-
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -31,19 +27,36 @@ require("lazy").setup({
 				"zbirenbaum/copilot-cmp",
 			}
 		},
-		{ "zbirenbaum/copilot.lua",                 cmd = "Copilot",                                 event = "InsertEnter" },
+		{ "zbirenbaum/copilot.lua",                 cmd = "Copilot",                            event = "InsertEnter" },
 		{ "zbirenbaum/copilot-cmp",                 dependencies = { "zbirenbaum/copilot.lua" } },
 		{ "nvim-treesitter/nvim-treesitter",        build = ":TSUpdate" },
 		{ 'nvim-treesitter/nvim-treesitter-context' },
-
+		{
+			"supermaven-inc/supermaven-nvim",
+			config = function()
+				require("supermaven-nvim").setup({})
+			end,
+		},
 		-- UI Enhancements
-		{ "catppuccin/nvim",                        name = "catppuccin",                             priority = 1000 },
-		{ "nvim-lualine/lualine.nvim",              dependencies = { "nvim-tree/nvim-web-devicons" } },
-		{ "folke/which-key.nvim",                   event = "VeryLazy" },
-		{ "nvim-tree/nvim-tree.lua",                dependencies = { "nvim-tree/nvim-web-devicons" } },
+		{
+			"metalelf0/black-metal-theme-neovim",
+			lazy = false,
+			priority = 1000,
+			config = function()
+				require("black-metal").setup({
+					-- optional configuration here
+					theme = "nile",
+
+				})
+				require("black-metal").load()
+			end,
+		},
+		{ "nvim-lualine/lualine.nvim",     dependencies = { "nvim-tree/nvim-web-devicons" } },
+		{ "folke/which-key.nvim",          event = "VeryLazy" },
+		{ "nvim-tree/nvim-tree.lua",       dependencies = { "nvim-tree/nvim-web-devicons" } },
 
 		-- Productivity
-		{ "nvim-telescope/telescope.nvim",          cmd = "Telescope" },
+		{ "nvim-telescope/telescope.nvim", cmd = "Telescope" },
 		{ "stevearc/conform.nvim" },
 		{
 			"theprimeagen/harpoon",
@@ -72,7 +85,6 @@ require("lazy").setup({
 		-- Icons & Misc
 		{ "nvim-tree/nvim-web-devicons" },
 	},
-	install = { colorscheme = { "catppuccin" } },
 	checker = { enabled = true },
 })
 
@@ -103,7 +115,7 @@ lspconfig.gleam.setup({})
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 lspconfig.ts_ls.setup({ capabilities = capabilities })
 lspconfig.eslint.setup({
-	on_attach = function(client, bufnr)
+	on_attach = function(lient, bufnr)
 		vim.api.nvim_create_autocmd("BufWritePre", {
 			buffer = bufnr,
 			command = "EslintFixAll",
@@ -119,11 +131,6 @@ require("mason-lspconfig").setup_handlers({
 	end,
 })
 
-require("copilot").setup({
-	suggestion = { enabled = false }, -- Disable inline suggestions
-	panel = { enabled = false }, -- No floating panel
-})
-require("copilot_cmp").setup()
 
 local cmp = require("cmp")
 cmp.setup({
@@ -134,8 +141,7 @@ cmp.setup({
 		["<CR>"] = cmp.mapping.confirm({ select = true }),
 	}),
 	sources = cmp.config.sources({
-		{ name = "nvim_lsp" },   -- LSP completions only
-		{ name = "copilot", group_index = 2 }, -- Copilot (secondary source)
+		{ name = "nvim_lsp" } -- LSP completions only
 	}),
 })
 
@@ -156,6 +162,8 @@ require("conform").setup({
 	},
 	format_on_save = { timeout_ms = 500, lsp_fallback = true },
 })
+
+
 vim.keymap.set({ "n", "v" }, "<leader>lf", function() require("conform").format({ async = true }) end,
 	{ desc = "Format Buffer" })
 
@@ -239,19 +247,7 @@ vim.keymap.set("x", "<leader>p", [["_dP]], { desc = "Paste without overwrite" })
 -- Enable true color support
 vim.opt.termguicolors = true
 vim.opt.background = "dark"
-vim.cmd.colorscheme("catppuccin-mocha");
 
--- Make a toggle for the theme <spc>tt (toggle theme)
-local function toggle_theme()
-	local theme = vim.g.colors_name
-	if theme == "catppuccin-mocha" then
-		vim.cmd("colorscheme catppuccin-latte")
-	else
-		vim.cmd("colorscheme catppuccin-mocha")
-	end
-end
-
-vim.keymap.set("n", "<leader>tt", toggle_theme, { desc = "Toggle Theme" })
 
 -- Number toggle
 vim.opt.number = true
