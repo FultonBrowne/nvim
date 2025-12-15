@@ -51,9 +51,8 @@ require("lazy").setup({
 				require("black-metal").load()
 			end,
 		},
-		{ "nvim-lualine/lualine.nvim",     dependencies = { "nvim-tree/nvim-web-devicons" } },
+		{ "nvim-lualine/lualine.nvim" },
 		{ "folke/which-key.nvim",          event = "VeryLazy" },
-		{ "nvim-tree/nvim-tree.lua",       dependencies = { "nvim-tree/nvim-web-devicons" } },
 
 		-- Productivity
 		{ "nvim-telescope/telescope.nvim", cmd = "Telescope" },
@@ -82,25 +81,10 @@ require("lazy").setup({
 				{ "<leader>5", function() require("harpoon"):list():select(5) end, desc = "harpoon to file 5", },
 			},
 		},
-		-- Icons & Misc
-		{ "nvim-tree/nvim-web-devicons" },
 	},
 	checker = { enabled = true },
 })
 
--- Configure nvim-tree
-require("nvim-tree").setup({
-	view = {
-		side = "right", -- Open file tree on the right side
-		width = 35, -- Set tree width
-	},
-	update_focused_file = {
-		enable = true,
-	},
-	filters = {
-		dotfiles = false, -- Show dotfiles
-	},
-})
 
 -- LSP Configuration
 require("mason").setup()
@@ -171,6 +155,7 @@ require("lualine").setup({
 	options = {
 		theme = "auto",
 		section_separators = "",
+		icons_enabled = false,
 		component_separators = "|",
 		globalstatus = true,
 	},
@@ -194,10 +179,10 @@ require("nvim-treesitter.configs").setup({
 
 -- Telescope keymaps
 local telescope = require("telescope.builtin")
-vim.keymap.set("n", "<leader>ff", telescope.git_files, { desc = "Find Git Files" })
+vim.keymap.set("n", "<C-p>", telescope.git_files, { desc = "Find Git Files" })
 vim.keymap.set("n", "<leader>fa", telescope.find_files, { desc = "Find Files" })
 vim.keymap.set("n", "<leader>fg", telescope.live_grep, { desc = "Live Grep" })
-vim.keymap.set("n", "<leader>fo", telescope.lsp_document_symbols, { desc = "Show Symbols" })
+vim.keymap.set("n", "<C-S-o>", telescope.lsp_document_symbols, { desc = "Show Symbols" })
 vim.keymap.set("n", "<leader>fs", ":NvimTreeToggle<CR>", { desc = "Toggle File Tree" })
 vim.keymap.set("n", "<leader>fb", telescope.buffers, { desc = "List Buffers" })
 -- Telescop git commands
